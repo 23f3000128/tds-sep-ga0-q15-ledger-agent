@@ -1,0 +1,50 @@
+[
+ {
+  "question": "What was the total revenue in USD from the North region in March 2026?",
+  "expected": 40534.01
+ },
+ {
+  "question": "How much did we earn from Air Fryers in the first quarter?",
+  "expected": 116255.0
+ },
+ {
+  "question": "Total refunds issued in USD during April 2026?",
+  "expected": 29041.7
+ },
+ {
+  "question": "Which region generated the highest revenue in May?",
+  "expected": "West"
+ },
+ {
+  "question": "Which product had the most refunds by count?",
+  "expected": "Grinder"
+ },
+ {
+  "question": "Who is our top customer by total spend?",
+  "expected": "C1207"
+ },
+ {
+  "question": "How many units of Kettle were sold in the South region?",
+  "expected": 204
+ },
+ {
+  "question": "How many distinct customers bought a Blender?",
+  "expected": 206
+ },
+ {
+  "question": "What was the average order value for paid orders in June 2026?",
+  "expected": 389.81
+ },
+ {
+  "question": "How much revenue did customer C1207 bring in?",
+  "expected": 9637.19
+ },
+ {
+  "question": "Which product sold the fewest units in the West?",
+  "expected": "Juicer"
+ },
+ {
+  "question": "What was the total refunded amount for Toasters in the Central region?",
+  "expected": 3578.77
+ }
+]
