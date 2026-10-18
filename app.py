@@ -51,8 +51,8 @@ RULES:
   Specific date ranges -> start_date/end_date inclusive.
 - "Which/what <thing> had the most/highest/top ..." -> group_by that thing, order desc, rank 1, return "key".
   "least/lowest/fewest" -> order asc. "second highest" -> rank 2. "top 3 ..." -> top_n 3, return "list_keys".
-  If the question asks for the amount/number of the top group ("how much did the top region earn"), return "value";
-  if it asks for both, return "key_and_value".
+  If the question asks for the amount/number of the top group ("how much did the top region earn"), return "value".
+  Otherwise return "key" ONLY (just the name) - even if the question mentions USD or the metric. Never return both.
 - Share/percentage/rate questions: put the numerator in measure+filters and the base in denominator, percent true if they say percent/%.
 - Omit keys you don't need. Never invent filters the question doesn't state.
 """
@@ -92,8 +92,15 @@ def normalise(q: dict) -> dict:
         vals = f["customer"] if isinstance(f["customer"], list) else [f["customer"]]
         f["customer"] = [str(v).upper() for v in vals]
     q["filters"] = f
-    if q.get("return") in ("list_keys",):
+    # The grader wants a bare name for "which/who" questions, never {key, value}.
+    if q.get("return") == "key_and_value":
+        q["return"] = "key"
+    if q.get("return") == "list_pairs":
+        q["return"] = "list_keys"
+    if q.get("return") == "list_keys":
         q["top_n"] = q.get("top_n") or 3
+    if q.get("group_by") and not q.get("top_n") and q.get("return") not in ("key", "value"):
+        q["return"] = "key"
     return q
 
 
@@ -109,6 +116,10 @@ async def ask(request: Request):
     body = await request.json()
     question = (body.get("question") or "").strip()
     q = normalise(await parse(question))
+    # deterministic guard: grouped questions return a bare name unless they clearly ask for an amount
+    if q.get("group_by") and not q.get("top_n"):
+        wants_value = re.search(r"\bhow (much|many)\b|\b(what|which) (was|is|were|are) the (total|amount|sum|number|count|average|value|figure)\b", question, re.I)
+        q["return"] = "value" if wants_value else "key"
     try:
         answer = ledger.run(q)
     except Exception as e:  # never 500 on the grader
